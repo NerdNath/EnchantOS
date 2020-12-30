@@ -8,8 +8,8 @@ function getThrottleValue {
 
 //The function that gives a pitch value that will perform a nice gravity turn
 function getTargetPitch {
-  //  *** first example gravity turn curve: 90 - 0.00274 * alt:radar^0.9562 ***
-  lock fPitch to round(90 - 0.00274 * alt:radar^0.9562, 1).
+  //  *** first example pitch-over curve: 90 - 0.00274 * alt:radar^0.9562 ***
+  local fPitch is round(90 - 0.00274 * alt:radar^0.9562, 1).
   if fPitch >= 0 {
     return fPitch.
   }
