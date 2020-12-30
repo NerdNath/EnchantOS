@@ -190,7 +190,7 @@ function doLaunchTasks {
   if ship:STATUS = "FLYING" or ship:STATUS = "SUB_ORBITAL" {
     // print "Flying or suborbital condition entered".
     lock throttle to getThrottleValue().
-    lock targetPitch to getTargetPitch().
+    set targetPitch to getTargetPitch().
     lock steering to heading(targetHeading, targetPitch).
     doStageCheckAndExecute().
   } else {
