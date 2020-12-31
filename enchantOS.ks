@@ -38,22 +38,22 @@ global scriptCalled is false.
 global launchUnderway is false.
 global launchAbortedDuringSession is false.
 global ascentCompleted is false.
-declare global internalScriptOptions to lexicon(
+global internalScriptOptions is lexicon(
   "Maneuver Lock", true,
   "Launch", true,
   "Hoverslam", false
 ).
-declare global internalScriptDelegates to lexicon(
+global internalScriptDelegates is lexicon(
   "Maneuver Lock", enchantMnvLock@,
   "Launch", enchantLaunch@,
   "Hoverslam", enchantHoverslam@
 ).
-declare global internalScriptStackInits to lexicon(
+global internalScriptStackInits is lexicon(
   "Maneuver Lock", createMnvLockBox@,
   "Launch", createLaunchBox@,
   "Hoverslam", createHvrslamBox@
 ).
-set consoleValues to lexicon(
+global consoleValues is lexicon(
   "width", 415,
   "height", 500,
   "xPos", 296,
