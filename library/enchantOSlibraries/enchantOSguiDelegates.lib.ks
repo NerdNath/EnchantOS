@@ -6,8 +6,8 @@ runoncepath("1:/library/guiTools.lib.ks").
 runoncepath("1:/library/fileIO.lib.ks").
 
 function minimizeToggle {
-  set guisWidgetsList to consoleGUI:WIDGETS.
-  set titlesWidgetsList to titleLayout:WIDGETS.
+  local guisWidgetsList is consoleGUI:WIDGETS.
+  local titlesWidgetsList is titleLayout:WIDGETS.
   if minimizeButton:TEXT = "Shrink" {
     //toggle the text in the button
     set minimizeButton:TEXT to "Expand".
@@ -29,43 +29,68 @@ function minimizeToggle {
 }
 
 function loadSelect {
-  parameter choice.
-  set loadScriptButton:ENABLED to true.
-  set scriptToLoad to choice.
-  fileList:ADD(choice).
+  parameter pressedDown.
+  local fileNamesList is list().
+  for file in archiveList {
+    fileNamesList:ADD(file:NAME).
+  }
+  if not(pressedDown) {
+    local textString is loadSelectPopup:TEXT.
+    if not(textString:LENGTH = 0) and fileNamesList:CONTAINS(textString) {
+      // print "String not 0 condition passed".
+      set loadScriptButton:ENABLED to true.
+      return loadSelectPopup:TEXT.
+      fileList:ADD(loadSelectPopup:TEXT).
+      print fileList:DUMP.
+    } else {
+      // print "String not 0 condition failed".
+    }
+  }
 }
 
 function loadClick {
-  set loadScriptButton:ENABLED to false.
-  scriptLoad(scriptToLoad). //from fileIO.lib.ks
+  scriptLoad(loadSelect(loadSelectPopup:PRESSED)). //from fileIO.lib.ks
   reListFiles().
   reListRunPopup().
   reListDeletePopup().
+  set loadScriptButton:ENABLED to false.
 }
 
-function runSelect {
-  parameter choice.
-  set runScriptButton:ENABLED to true.
-  set scriptToRun to choice.
+function runSelected {
+  parameter pressedDown.
+  if not(pressedDown) and not(runSelectPopup:TEXT:LENGTH = 0) {
+    set runScriptButton:ENABLED to true.
+    return runSelectPopup:TEXT.
+  } else return false.
+  
 }
 
-function runClick {
+function runClicked {
   set runScriptButton:ENABLED to false.
   set scriptCalled to true.
 }
 
 function deleteSelect {
-  parameter choice.
-  set deleteScriptButton:ENABLED to true.
-  set scriptToDelete to choice.
+  parameter pressedDown.
+  local fileListNames is list().
+  local popupText is deleteSelectPopup:TEXT.
+  for file in fileList {
+    fileListNames:ADD(file:NAME).
+  }
+  if not(pressedDown) {
+    if not(popupText:LENGTH = 0) and fileListNames:CONTAINS(popupText) {
+      set deleteScriptButton:ENABLED to true.
+      return popupText.
+    }
+  }
 }
 
 function deleteClick {
-  set deleteScriptButton:ENABLED to false.
-  deletepath(scriptToDelete).
+  deletepath(deleteSelect(deleteSelectPopup:PRESSED)).
   reListDeletePopup().
   reListRunPopup().
   reListFiles().
+  set deleteScriptButton:ENABLED to false.
 }
 
 function reListFiles {

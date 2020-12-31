@@ -31,30 +31,29 @@ if ship:CONNECTION:ISCONNECTED {
 // core:DOEVENT("close terminal").
 
 //initialize program variables
-set archiveList to createScriptOnlyFileList(). //called from fileIO.lib.ks
-lock fileList to createScriptOnlyFileList(1). //using the optional parameter
-set terminateCommanded to false.
-set scriptCalled to false.
-set scriptToRun to "none".
-set launchUnderway to false.
-set launchAbortedDuringSession to false.
-set ascentCompleted to false.
-declare global internalScriptOptions to lexicon(
+global archiveList is createScriptOnlyFileList(). //called from fileIO.lib.ks
+lock fileList to createScriptOnlyFileList(1). //using optional parameter
+global terminateCommanded is false.
+global scriptCalled is false.
+global launchUnderway is false.
+global launchAbortedDuringSession is false.
+global ascentCompleted is false.
+global internalScriptOptions is lexicon(
   "Maneuver Lock", true,
   "Launch", true,
   "Hoverslam", false
 ).
-declare global internalScriptDelegates to lexicon(
+global internalScriptDelegates is lexicon(
   "Maneuver Lock", enchantMnvLock@,
   "Launch", enchantLaunch@,
   "Hoverslam", enchantHoverslam@
 ).
-declare global internalScriptStackInits to lexicon(
+global internalScriptStackInits is lexicon(
   "Maneuver Lock", createMnvLockBox@,
   "Launch", createLaunchBox@,
   "Hoverslam", createHvrslamBox@
 ).
-set consoleValues to lexicon(
+global consoleValues is lexicon(
   "width", 415,
   "height", 500,
   "xPos", 296,
@@ -62,7 +61,7 @@ set consoleValues to lexicon(
   "isDraggable", false,
   "hint", "none" //type "none" here to not use this
 ).
-set consoleGUI to initGUI(consoleValues). //from guiTools.lib.ks
+global consoleGUI is initGUI(consoleValues). //from guiTools.lib.ks
 
 //call the gui create functions from the guiCreate.lib file
 createTitleBar().
@@ -70,7 +69,6 @@ createLoadLayout().
 createRunLayout().
 createDeleteLayout().
 createScriptsBox().
-createInternalScriptsArea().
 createAutomationListEditButton().
 createInternalAutomationBox().
 createAutomationListEditBox().
@@ -85,7 +83,8 @@ consoleGUI:SHOW.
 //main program loop
 until terminateCommanded {
   if scriptCalled {
-    runpath(scriptToRun).
+    runpath(runSelected(runSelectPopup:PRESSED)).
+    set runScriptButton:ENABLED to false.
     set scriptCalled to false.
   }
   if launchUnderway {
