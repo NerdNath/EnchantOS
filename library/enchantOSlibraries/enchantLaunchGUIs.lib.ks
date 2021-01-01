@@ -80,7 +80,7 @@ function createPostLiftoffButtons {
   set editorRevert:ONCLICK to revertToEditorClicked@.
   local launchRevert is launchBox:ADDBUTTON("Revert to Launch").
   set launchRevert:ONCLICK to revertToLaunchClicked@.
-  local throttOverride is launchBox:ADDBUTTON("Override Throttle").
+  global throttOverride is launchBox:ADDBUTTON("Override Throttle").
   set throttOverride:ONCLICK to throttleOverrideClicked@.
   global launchAbortButton is launchBox:ADDBUTTON("Abort Launch").
   set launchAbortButton:STYLE:TEXTCOLOR to RGBA(1, 0, 0, 0.6).
