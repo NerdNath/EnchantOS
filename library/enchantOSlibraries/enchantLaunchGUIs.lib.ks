@@ -82,10 +82,15 @@ function createPostLiftoffButtons {
   set launchRevert:ONCLICK to revertToLaunchClicked@.
   local throttOverride is launchBox:ADDBUTTON("Override Throttle").
   set throttOverride:ONCLICK to throttleOverrideClicked@.
-  local launchAbortButton is launchBox:ADDBUTTON("Abort Launch").
+  global launchAbortButton is launchBox:ADDBUTTON("Abort Launch").
   set launchAbortButton:STYLE:TEXTCOLOR to RGBA(1, 0, 0, 0.6).
   set launchAbortButton:STYLE:FONTSIZE to 30.
   set launchAbortButton:STYLE:WORDWRAP to true.
   set launchAbortButton:STYLE:HEIGHT to 80.
   set launchAbortButton:ONCLICK to abortLaunch@.
+  global launchConcludeButton to launchBox:ADDBUTTON("Conclude Launch").
+  set launchConcludeButton:STYLE:FONTSIZE to 30.
+  set launchConcludeButton:STYLE:WORDWRAP to true.
+  set launchConcludeButton:STYLE:HEIGHT to 80.
+  set launchConcludeButton:ONCLICK to switchToPrelaunch@.
 }
