@@ -34,30 +34,34 @@ function doSafeStage {
 
 function doSmartStage {
   list engines in enList.
-  set nextStage to STAGE:NUMBER - 1.
-  set enInNext to list().
-  set nonSepList to list().
-  print STAGE:NUMBER.
+  local nextStage is stage:NUMBER - 1.
+  local dontStageTwice is false.
+  local enInNext is list().
+  local nonSepList is list().
+  // print STAGE:NUMBER.
   for en in enList {
     if not(en:NAME = "sepMotor1") {
       nonSepList:ADD(en).
     }
   }
   for engine in nonSepList {
-    print engine:STAGE.
     if engine:STAGE = nextStage {
       print "engine " + engine:NAME + " added to enInNext list".
       enInNext:ADD(engine).
+    } else if engine:STAGE = stage:NUMBER and engine:DECOUPLEDIN = nextStage - 1{
+      set dontStageTwice to true.
     }
   }
-  if enInNext:EMPTY {
+  if enInNext:EMPTY and dontStageTwice = false {
     wait 1.
     doSafeStage().
     wait 1.
     doSafeStage().
+    print "Performed a 2 step staging sequence".
   } else {
     wait 1.
     doSafeStage().
+    print "Performed a 1 step staging sequence".
   }
 }
 
@@ -67,7 +71,7 @@ function stageSpent {
   list engines in eList.
   set stageEngines to list().
   for engine in eList {
-    if engine:STAGE = STAGE:NUMBER {
+    if engine:STAGE = stage:NUMBER {
       stageEngines:ADD(engine).
     }
   }
@@ -117,15 +121,18 @@ function doSmartLiftOff {
     doSafeStage().
     wait 1.
     doSafeStage().
+    print "Performed a 2 step liftoff".
   } else {
     lock steering to up.
     lock throttle to 1.
     doSafeStage().
+    print "Performed a 1 step liftoff".
   }
 }
 
 function doStageCheckAndExecute {
   if stageSpent() = true {
     doSmartStage().
-  }
+    return true.
+  } else return false.
 }
