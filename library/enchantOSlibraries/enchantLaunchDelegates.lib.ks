@@ -193,8 +193,11 @@ function doLaunchTasks {
     wait 1.
   }
   if ship:APOAPSIS >= targetApoapsis {
+    launchAbortButton:HIDE.
+    launchConcludeButton:SHOW.
     set ascentCompleted to true.
     set launchUnderway to false.
+    set statusReadout:TEXT to "Ascent Complete!...".
   }
   if ship:STATUS = "FLYING" or ship:STATUS = "SUB_ORBITAL" {
     // print "Flying or suborbital condition entered".
@@ -277,6 +280,7 @@ function switchToPostLiftoff {
       widgetToShow:SHOW.
     }
   }
+  launchConcludeButton:HIDE.
 }
 
 function revertToEditorClicked {
