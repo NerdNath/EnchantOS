@@ -172,17 +172,24 @@ function updateStaticReadouts {
 function updateDynamicReadouts {
   //update the target pitch to reflect where the ship wants to pitch to at
   //the current altitude.
-  set trgtPitchReadout:TEXT to "Target Pitch: " + getTargetPitch().
+  set trgtPitchReadout:TEXT to "Target Pitch: " + getTargetPitch() + " deg".
   set currentGsReadout:TEXT to "Current G-Force: " + getGLoad().
   if ship:STATUS = "PRELAUNCH" {
     set statusReadout:TEXT to "Standing by to Launch...".
+  } else if defined stageTime and time:SECONDS <= stageTime + 5 {
+    return.
+  } else if ship:STATUS = "FLYING" and time:SECONDS >= liftoffTime + 3 {
+    set statusReadout:TEXT to "Burning stage number " + stage:NUMBER.
   }
 }
 
 function doLaunchTasks {
   updateDynamicReadouts().
   if ship:STATUS = "PRELAUNCH" {
+    set statusReadout:TEXT to "Ignition and...".
+    global liftoffTime is time:SECONDS.
     doSmartLiftoff().
+    set statusReadout:TEXT to "Liftoff!...".
     wait 1.
   }
   if ship:APOAPSIS >= targetApoapsis {
@@ -194,6 +201,10 @@ function doLaunchTasks {
     lock throttle to getThrottleValue().
     set targetPitch to getTargetPitch().
     lock steering to heading(targetHeading, targetPitch).
+    if stageSpent() {
+      declare global stageTime to time:SECONDS.
+      set statusReadout:TEXT to "Staging...".
+    }
     doStageCheckAndExecute().
   } else {
     print " ".
