@@ -201,7 +201,12 @@ function doLaunchTasks {
   }
   if ship:STATUS = "FLYING" or ship:STATUS = "SUB_ORBITAL" {
     // print "Flying or suborbital condition entered".
-    lock throttle to getThrottleValue().
+    if not(defined beenOverridden) or beenOverridden = false {
+      lock throttle to getThrottleValue().
+    }
+    if defined beenOverridden {
+      print "beenOverridden is " + beenOverridden at(0, 20).
+    }
     set targetPitch to getTargetPitch().
     lock steering to heading(targetHeading, targetPitch).
     if stageSpent() {
@@ -300,10 +305,20 @@ function revertToLaunchClicked {
 }
 
 function throttleOverrideClicked {
-  if not(defined beenOverridden) {
-    global beenOverridden is true.
-    set SHIP:CONTROL:PILOTMAINTHROTTLE to getThrottleValue(). 
+  if throttOverride:TEXT = "Override Throttle" {
+    if not(defined beenOverridden) {
+      declare global beenOverridden to true.
+      set SHIP:CONTROL:PILOTMAINTHROTTLE to getThrottleValue(). 
+    } else {
+      set beenOverridden to true.
+    }
+    unlock throttle.
+    set throttOverride:TEXT to "Return Throttle Control".
+  } else {
+    set beenOverridden to false.
+    set throttOverride:TEXT to "Override Throttle".
   }
-  unlock throttle.
+  
+  
 }
 
