@@ -204,9 +204,6 @@ function doLaunchTasks {
     if not(defined beenOverridden) or beenOverridden = false {
       lock throttle to getThrottleValue().
     }
-    if defined beenOverridden {
-      print "beenOverridden is " + beenOverridden at(0, 20).
-    }
     set targetPitch to getTargetPitch().
     lock steering to heading(targetHeading, targetPitch).
     if stageSpent() {
@@ -222,9 +219,10 @@ function doLaunchTasks {
 }
 
 function doReleaseTasks {
-  if not(defined beenOverridden) {
-    set PILOTMAINTHROTTLE to getThrottleValue().
+  if not(launchAbortedDuringSession) {
+    set ship:CONTROL:PILOTMAINTHROTTLE to 0.
   }
+  set throttOverride:ENABLED to false.
   unlock throttle.
   unlock steering.
 }
@@ -317,8 +315,5 @@ function throttleOverrideClicked {
   } else {
     set beenOverridden to false.
     set throttOverride:TEXT to "Override Throttle".
-  }
-  
-  
+  }  
 }
-
