@@ -172,28 +172,44 @@ function updateStaticReadouts {
 function updateDynamicReadouts {
   //update the target pitch to reflect where the ship wants to pitch to at
   //the current altitude.
-  set trgtPitchReadout:TEXT to "Target Pitch: " + getTargetPitch().
+  set trgtPitchReadout:TEXT to "Target Pitch: " + getTargetPitch() + " deg".
   set currentGsReadout:TEXT to "Current G-Force: " + getGLoad().
   if ship:STATUS = "PRELAUNCH" {
     set statusReadout:TEXT to "Standing by to Launch...".
+  } else if defined stageTime and time:SECONDS <= stageTime + 5 {
+    return.
+  } else if ship:STATUS = "FLYING" and time:SECONDS >= liftoffTime + 3 {
+    set statusReadout:TEXT to "Burning stage number " + stage:NUMBER.
   }
 }
 
 function doLaunchTasks {
   updateDynamicReadouts().
   if ship:STATUS = "PRELAUNCH" {
+    set statusReadout:TEXT to "Ignition and...".
+    global liftoffTime is time:SECONDS.
     doSmartLiftoff().
+    set statusReadout:TEXT to "Liftoff!...".
     wait 1.
   }
   if ship:APOAPSIS >= targetApoapsis {
+    launchAbortButton:HIDE.
+    launchConcludeButton:SHOW.
     set ascentCompleted to true.
     set launchUnderway to false.
+    set statusReadout:TEXT to "Ascent Complete!...".
   }
   if ship:STATUS = "FLYING" or ship:STATUS = "SUB_ORBITAL" {
     // print "Flying or suborbital condition entered".
-    lock throttle to getThrottleValue().
+    if not(defined beenOverridden) or beenOverridden = false {
+      lock throttle to getThrottleValue().
+    }
     set targetPitch to getTargetPitch().
     lock steering to heading(targetHeading, targetPitch).
+    if stageSpent() {
+      declare global stageTime to time:SECONDS.
+      set statusReadout:TEXT to "Staging...".
+    }
     doStageCheckAndExecute().
   } else {
     print " ".
@@ -203,9 +219,10 @@ function doLaunchTasks {
 }
 
 function doReleaseTasks {
-  if not(defined beenOverridden) {
-    set PILOTMAINTHROTTLE to getThrottleValue().
+  if not(launchAbortedDuringSession) {
+    set ship:CONTROL:PILOTMAINTHROTTLE to 0.
   }
+  set throttOverride:ENABLED to false.
   unlock throttle.
   unlock steering.
 }
@@ -266,6 +283,7 @@ function switchToPostLiftoff {
       widgetToShow:SHOW.
     }
   }
+  launchConcludeButton:HIDE.
 }
 
 function revertToEditorClicked {
@@ -285,10 +303,17 @@ function revertToLaunchClicked {
 }
 
 function throttleOverrideClicked {
-  if not(defined beenOverridden) {
-    global beenOverridden is true.
-    set SHIP:CONTROL:PILOTMAINTHROTTLE to getThrottleValue(). 
-  }
-  unlock throttle.
+  if throttOverride:TEXT = "Override Throttle" {
+    if not(defined beenOverridden) {
+      declare global beenOverridden to true.
+      set SHIP:CONTROL:PILOTMAINTHROTTLE to getThrottleValue(). 
+    } else {
+      set beenOverridden to true.
+    }
+    unlock throttle.
+    set throttOverride:TEXT to "Return Throttle Control".
+  } else {
+    set beenOverridden to false.
+    set throttOverride:TEXT to "Override Throttle".
+  }  
 }
-
