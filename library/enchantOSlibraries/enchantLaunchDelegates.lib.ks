@@ -206,6 +206,17 @@ function doLaunchTasks {
     }
     set targetPitch to getTargetPitch().
     lock steering to heading(targetHeading, targetPitch).
+    for part in ship:PARTS {
+      if part:NAME:CONTAINS("fairing") and part:STAGE = stage:NUMBER - 1 {
+        if ship:ALTITUDE >= 70000 {
+        declare global stageTime to time:SECONDS.
+        set statusReadout:TEXT to "Fairing Jettisoned...".
+        doSafeStage().
+        print "performed a 1 step staging event".
+        wait 1.
+        }
+      }
+    }
     if stageSpent() {
       declare global stageTime to time:SECONDS.
       set statusReadout:TEXT to "Staging...".
