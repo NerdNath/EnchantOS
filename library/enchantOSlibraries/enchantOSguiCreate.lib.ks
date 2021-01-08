@@ -17,10 +17,7 @@ function createTitleBar {
   //Make a button to end the program
   global quitButton is titleLayout:ADDBUTTON("Exit").
   set quitButton:STYLE:HSTRETCH to false.
-  //attach the terminate function from guiTools.lib to a delegate variable
-  local quitDelegate is terminateProgram@.
-  //use the delegate variable in an anonymous funtion to call it on console 
-  set quitButton:ONCLICK to {quitDelegate:CALL(consoleGUI).}.
+  set quitButton:ONCLICK to terminateProgram@:BIND(consoleGUI).
 }
 
 function createLoadLayout {
