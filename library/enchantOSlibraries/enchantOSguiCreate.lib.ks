@@ -135,7 +135,7 @@ function createMnvLockBox {
 
 function createLaunchBox {
   local launchStack is consoleGUI:WIDGETS[5]:WIDGETS[1]:ADDSTACK().
-  global launchBox is launchStack:ADDVBOX().
+  local launchBox is launchStack:ADDVBOX().
   set launchBox:STYLE:HEIGHT to 312.
   initLaunchDefaults().//from enchantLaunchDelegates.lib.ks
   initHeadingOptions().//needed to control runtime of lexicons
@@ -147,7 +147,13 @@ function createLaunchBox {
   createPostLiftoffReadouts().
   createPostLiftoffButtons().
 
-  switchToPrelaunch().//from enchantLaunchDelegates.lib.ks
+  switchToPrelaunch(
+    consoleGUI:
+    WIDGETS[5]:
+    WIDGETS[1]:
+    WIDGETS[2]:
+    WIDGETS[0]
+  ).//from enchantLaunchDelegates.lib.ks
 }
 
 function createHvrslamBox {
