@@ -3,19 +3,20 @@
 
 function createTitleBar {
   //Make a collection of widgets for the enchantOS title bar
-  global titleLayout is consoleGUI:ADDHLAYOUT().
+  local titleLayout is consoleGUI:ADDHLAYOUT().
 
   //Make a button to minimize the enchantOS console
-  global minimizeButton is titleLayout:ADDBUTTON("Shrink").
+  local minimizeButton is titleLayout:ADDBUTTON("Shrink").
   set minimizeButton:STYLE:HSTRETCH to false.
-  set minimizeButton:ONCLICK to minimizeToggle@. //in the delegate library
+  set minimizeButton:ONCLICK to minimizeToggle@:BIND(minimizeButton).
   
-  local titleText is titleLayout:ADDLABEL("<size=20>Welcome to EnchantOS!</size>").
+  local titleText is titleLayout:ADDLABEL("Welcome to EnchantOS!").
+  set titleText:STYLE:FONTSIZE to 23.
   set titleText:STYLE:HSTRETCH to true.
   set titleText:STYLE:ALIGN to "CENTER".
 
   //Make a button to end the program
-  global quitButton is titleLayout:ADDBUTTON("Exit").
+  local quitButton is titleLayout:ADDBUTTON("Exit").
   set quitButton:STYLE:HSTRETCH to false.
   set quitButton:ONCLICK to terminateProgram@:BIND(consoleGUI).
 }
@@ -23,82 +24,80 @@ function createTitleBar {
 function createLoadLayout {
   local  loadLayout is consoleGUI:ADDHLAYOUT().
   local loadLabel is loadLayout:ADDLABEL("Select a Script to Load:").
-  global loadSelectPopup is loadLayout:ADDPOPUPMENU().
+  local loadSelectPopup is loadLayout:ADDPOPUPMENU().
   set loadSelectPopup:STYLE:WIDTH to 140.
-  global loadScriptButton is loadLayout:ADDBUTTON("Load Script").
+  local loadScriptButton is loadLayout:ADDBUTTON("Load Script").
   set loadScriptButton:STYLE:HSTRETCH to false.
   set loadScriptButton:STYLE:WIDTH to 85.
   set loadScriptButton:ENABLED to false.
   set loadSelectPopup:OPTIONS to archiveList.
-  set loadSelectPopup:ONTOGGLE to loadSelect@.
-  set loadScriptButton:ONCLICK to loadClick@.
+  set loadSelectPopup:ONCLICK to loadSelect@:BIND(loadSelectPopup).
+  set loadScriptButton:ONCLICK to loadClick@:BIND(loadScriptButton).
 }
 
 function createRunLayout {
   local runLayout is consoleGUI:ADDHLAYOUT().
   local runLabel is runLayout:ADDLABEL("Select a Script to Run:").
-  global runSelectPopup is runLayout:ADDPOPUPMENU().
+  local runSelectPopup is runLayout:ADDPOPUPMENU().
   set runSelectPopup:STYLE:WIDTH to 140.
-  global runScriptButton is runLayout:ADDBUTTON("Run Script").
+  local runScriptButton is runLayout:ADDBUTTON("Run Script").
   set runScriptButton:STYLE:HSTRETCH to false.
   set runScriptButton:STYLE:WIDTH to 85.
   set runScriptButton:ENABLED to false.
   set runSelectPopup:OPTIONS to fileList.
-  set runSelectPopup:ONTOGGLE to runSelected@.
-  set runScriptButton:ONCLICK to runClicked@.
+  set runSelectPopup:ONCLICK to runSelected@:BIND(runSelectPopup).
+  set runScriptButton:ONCLICK to runClicked@:BIND(runScriptButton).
 }
 
 function createDeleteLayout {
   local deleteLayout is consoleGUI:ADDHLAYOUT().
   local deleteLabel is deleteLayout:ADDLABEL("Select a Script to Delete:").
-  global deleteSelectPopup is deleteLayout:ADDPOPUPMENU().
+  local deleteSelectPopup is deleteLayout:ADDPOPUPMENU().
   set deleteSelectPopup:STYLE:WIDTH to 140.
-  global deleteScriptButton is deleteLayout:ADDBUTTON("Delete Script").
+  local deleteScriptButton is deleteLayout:ADDBUTTON("Delete Script").
   set deleteScriptButton:STYLE:HSTRETCH to false.
   set deleteScriptButton:STYLE:WIDTH to 85.
   set deleteScriptButton:ENABLED to false.
   set deleteSelectPopup:OPTIONS to fileList.
-  set deleteSelectPopup:ONTOGGLE to deleteSelect@.
-  set deleteScriptButton:ONCLICK to deleteClick@.
+  set deleteSelectPopup:ONCLICK to deleteSelect@:BIND(deleteSelectPopup).
+  set deleteScriptButton:ONCLICK to deleteClick@:BIND(deleteScriptButton).
 }
 
 function createScriptsBox {
-  global scriptTitlesBox is consoleGUI:ADDHLAYOUT().
+  local scriptTitlesBox is consoleGUI:ADDHLAYOUT().
   set scriptTitlesBox:STYLE:WIDTH to 400.
   local cpuVolumeTitle is scriptTitlesBox:ADDLABEL("Volume: 1:/").
   local internalScriptsAreaTitle is scriptTitlesBox:ADDLABEL("Internal Automation:").
   set internalScriptsAreaTitle:STYLE:ALIGN to "RIGHT".
+  local autoListEdit is scriptTitlesBox:ADDBUTTON("EDIT").
+  set autoListEdit:TOGGLE to true.
+  set autoListEdit:STYLE:FONTSIZE to 12.
+  set autoListEdit:STYLE:WIDTH to 65.
+  set autoListEdit:STYLE:HEIGHT to 15.
+  set autoListEdit:STYLE:MARGIN:TOP to 10.
+  set autoListEdit:ONCLICK to automationListEditClick@:BIND(autoListEdit).
+
   local scriptsArea is consoleGUI:ADDHLAYOUT().
-  global cpuFilesBox is scriptsArea:ADDSCROLLBOX().
+  local cpuFilesBox is scriptsArea:ADDSCROLLBOX().
   set cpuFilesBox:STYLE:WIDTH to 192.
   reListFiles(). //from enchantOSguiDelegates.lib.ks
-  global internalScriptsArea is scriptsArea:ADDVLAYOUT().
+  local internalScriptsArea is scriptsArea:ADDVLAYOUT().
   set internalScriptsArea:STYLE:WIDTH to 192.
 }
 
 function createInternalAutomationBox {
-  global internalAutomationListStack is internalScriptsArea:ADDSTACK().
-  global internalAutomationBox is internalAutomationListStack:ADDSCROLLBOX().
+  local internalAutoListStack is consoleGUI:WIDGETS[5]:WIDGETS[1]:ADDSTACK().
+  local internalAutomationBox is internalAutoListStack:ADDSCROLLBOX().
   for key in internalScriptOptions:KEYS {
-    local automationButton is internalAutomationBox:ADDBUTTON(key).
-    set automationButton:ONCLICK to internalScriptDelegates[key].
-    automationButton:HIDE.
+    local autoBtn is internalAutomationBox:ADDBUTTON(key).
+    set autoBtn:ONCLICK to internalScriptDelegates[key]:BIND(autoBtn).
+    autoBtn:HIDE.
     internalScriptStackInits[key]:call().
   }
 }
 
-function createAutomationListEditButton {
-  global automationListEdit is scriptTitlesBox:ADDBUTTON("EDIT").
-  set automationListEdit:TOGGLE to true.
-  set automationListEdit:STYLE:FONTSIZE to 12.
-  set automationListEdit:STYLE:WIDTH to 65.
-  set automationListEdit:STYLE:HEIGHT to 15.
-  set automationListEdit:STYLE:MARGIN:TOP to 10.
-  set automationListEdit:ONCLICK to automationListEditClick@.
-}
-
 function createAutomationListEditBox {
-  global automationListEditStack is internalScriptsArea:ADDSTACK().
+  local automationListEditStack is consoleGUI:WIDGETS[5]:WIDGETS[1]:ADDSTACK().
   local automationListEditBox is automationListEditStack:ADDSCROLLBOX.
   local sampleButton is automationListEditBox:ADDBUTTON("Sample Button").
   set sampleButton:STYLE:HSTRETCH to false.
@@ -125,18 +124,18 @@ function createAutomationListEditBox {
 }
 
 function createMnvLockBox {
-  global mnvLockStack is internalScriptsArea:ADDSTACK().
+  local mnvLockStack is consoleGUI:WIDGETS[5]:WIDGETS[1]:ADDSTACK().
   local mnvLockBox is mnvLockStack:ADDVBOX().
   set mnvLockBox:STYLE:HEIGHT to 312.
 
   local closeButtonSpacer is mnvLockBox:ADDSPACING(-1).
   local mnvCloseButton is mnvLockBox:ADDBUTTON("Close").
-  set mnvCloseButton:ONCLICK to closeAutomationClicked@.
+  set mnvCloseButton:ONCLICK to closeAutomationClicked@:BIND(mnvCloseButton).
 }
 
 function createLaunchBox {
-  global launchStack is internalScriptsArea:ADDSTACK().
-  global launchBox is launchStack:ADDVBOX().
+  local launchStack is consoleGUI:WIDGETS[5]:WIDGETS[1]:ADDSTACK().
+  local launchBox is launchStack:ADDVBOX().
   set launchBox:STYLE:HEIGHT to 312.
   initLaunchDefaults().//from enchantLaunchDelegates.lib.ks
   initHeadingOptions().//needed to control runtime of lexicons
@@ -148,15 +147,21 @@ function createLaunchBox {
   createPostLiftoffReadouts().
   createPostLiftoffButtons().
 
-  switchToPrelaunch().//from enchantLaunchDelegates.lib.ks
+  switchToPrelaunch(
+    consoleGUI:
+    WIDGETS[5]:
+    WIDGETS[1]:
+    WIDGETS[2]:
+    WIDGETS[0]
+  ).//from enchantLaunchDelegates.lib.ks
 }
 
 function createHvrslamBox {
-  global hoverslamStack is internalScriptsArea:ADDSTACK().
+  local hoverslamStack is consoleGUI:WIDGETS[5]:WIDGETS[1]:ADDSTACK().
   local hoverslamBox is hoverslamStack:ADDVBOX().
   set hoverslamBox:STYLE:HEIGHT to 312.
 
   local closeButtonSpacer is hoverslamBox:ADDSPACING(-1).
-  local closeHvrslamAutomation is hoverslamBox:ADDBUTTON("Close").
-  set closeHvrslamAutomation:ONCLICK to closeAutomationClicked@.
+  local closeHvrslam is hoverslamBox:ADDBUTTON("Close").
+  set closeHvrslam:ONCLICK to closeAutomationClicked@:BIND(closeHvrslam).
 }

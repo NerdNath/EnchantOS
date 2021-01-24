@@ -6,41 +6,41 @@ runoncepath("1:/library/guiTools.lib.ks").
 runoncepath("1:/library/fileIO.lib.ks").
 
 function minimizeToggle {
-  local guisWidgetsList is consoleGUI:WIDGETS.
-  local titlesWidgetsList is titleLayout:WIDGETS.
-  if minimizeButton:TEXT = "Shrink" {
+  parameter buttonCalledFrom.
+  if buttonCalledFrom:TEXT = "Shrink" {
     //toggle the text in the button
-    set minimizeButton:TEXT to "Expand".
+    set buttonCalledFrom:TEXT to "Expand".
     //toggle the state of the console gui
-    consoleGUI:SHOWONLY(titleLayout).
-    titleLayout:SHOWONLY(minimizeButton).
-    quitButton:SHOW.
+    buttonCalledFrom:PARENT:PARENT:SHOWONLY(buttonCalledFrom:PARENT).
+    buttonCalledFrom:PARENT:SHOWONLY(buttonCalledFrom).
+    buttonCalledFrom:PARENT:WIDGETS[2]:SHOW.
     set consoleGUI:STYLE:WIDTH to 115.
   } else {
-    set minimizeButton:TEXT to "Shrink".
+    set buttonCalledFrom:TEXT to "Shrink".
     set consoleGUI:STYLE:WIDTH to consoleValues:width.
-    for widget in guisWidgetsList {
+    for widget in buttonCalledFrom:PARENT:PARENT:WIDGETS {
       widget:SHOW.
     }
-    for widget in titlesWidgetsList {
+    for widget in buttonCalledFrom:PARENT:WIDGETS {
       widget:SHOW.
     }
   }
 }
 
 function loadSelect {
-  parameter pressedDown.
+  parameter buttonCalledFrom.
+  local isPressed is buttonCalledFrom:PRESSED.
   local fileNamesList is list().
   for file in archiveList {
     fileNamesList:ADD(file:NAME).
   }
-  if not(pressedDown) {
-    local textString is loadSelectPopup:TEXT.
+  if not(isPressed) {
+    local textString is buttonCalledFrom:TEXT.
     if not(textString:LENGTH = 0) and fileNamesList:CONTAINS(textString) {
       // print "String not 0 condition passed".
-      set loadScriptButton:ENABLED to true.
-      return loadSelectPopup:TEXT.
-      fileList:ADD(loadSelectPopup:TEXT).
+      set buttonCalledFrom:PARENT:WIDGETS[2]:ENABLED to true.
+      return buttonCalledFrom:TEXT.
+      fileList:ADD(buttonCalledFrom:TEXT).
       print fileList:DUMP.
     } else {
       // print "String not 0 condition failed".
@@ -49,54 +49,60 @@ function loadSelect {
 }
 
 function loadClick {
-  scriptLoad(loadSelect(loadSelectPopup:PRESSED)). //from fileIO.lib.ks
+  parameter buttonCalledFrom.
+  scriptLoad(loadSelect(buttonCalledFrom:PARENT:WIDGETS[1])). //from fileIO.lib.ks
   reListFiles().
-  reListRunPopup().
-  reListDeletePopup().
-  set loadScriptButton:ENABLED to false.
+  reListRunPopup(buttonCalledFrom:PARENT:PARENT:WIDGETS[2]:WIDGETS[1]).
+  reListDeletePopup(buttonCalledFrom:PARENT:PARENT:WIDGETS[3]:WIDGETS[1]).
+  set buttonCalledFrom:ENABLED to false.
 }
 
 function runSelected {
-  parameter pressedDown.
-  if not(pressedDown) and not(runSelectPopup:TEXT:LENGTH = 0) {
-    set runScriptButton:ENABLED to true.
-    return runSelectPopup:TEXT.
+  parameter buttonCalledFrom.
+  local pressedDown is buttonCalledFrom:PRESSED.
+  if not(pressedDown) and not(buttonCalledFrom:TEXT:LENGTH = 0) {
+    set buttonCalledFrom:PARENT:WIDGETS[2]:ENABLED to true.
+    return buttonCalledFrom:TEXT.
   } else return false.
   
 }
 
 function runClicked {
-  set runScriptButton:ENABLED to false.
+  parameter buttonCalledFrom.
+  set buttonCalledFrom:ENABLED to false.
   set scriptCalled to true.
+  set scriptToRun to buttonCalledFrom:PARENT:WIDGETS[1]:TEXT.
 }
 
 function deleteSelect {
-  parameter pressedDown.
+  parameter buttonCalledFrom.
+  local pressedDown is buttonCalledFrom:PRESSED.
   local fileListNames is list().
-  local popupText is deleteSelectPopup:TEXT.
+  local popupText is buttonCalledFrom:TEXT.
   for file in fileList {
     fileListNames:ADD(file:NAME).
   }
   if not(pressedDown) {
     if not(popupText:LENGTH = 0) and fileListNames:CONTAINS(popupText) {
-      set deleteScriptButton:ENABLED to true.
+      set buttonCalledFrom:PARENT:WIDGETS[2]:ENABLED to true.
       return popupText.
     }
   }
 }
 
 function deleteClick {
-  deletepath(deleteSelect(deleteSelectPopup:PRESSED)).
-  reListDeletePopup().
-  reListRunPopup().
+  parameter buttonCalledFrom.
+  deletepath(deleteSelect(buttonCalledFrom:PARENT:WIDGETS[1])).
+  reListDeletePopup(buttonCalledFrom:PARENT:PARENT:WIDGETS[3]:WIDGETS[1]).
+  reListRunPopup(buttonCalledFrom:PARENT:PARENT:WIDGETS[2]:WIDGETS[1]).
   reListFiles().
-  set deleteScriptButton:ENABLED to false.
+  set buttonCalledFrom:ENABLED to false.
 }
 
 function reListFiles {
-  cpuFilesBox:CLEAR.
+  consoleGUI:WIDGETS[5]:WIDGETS[0]:CLEAR.
   for item in fileList {
-    set shownFile to cpuFilesBox:ADDLABEL(item:NAME).
+    local shownFile is consoleGUI:WIDGETS[5]:WIDGETS[0]:ADDLABEL(item:NAME).
     set shownFile:STYLE:MARGIN:TOP to 1.
     set shownFile:STYLE:MARGIN:BOTTOM to 1.
     set shownFile:STYLE:PADDING:TOP to 1.
@@ -105,17 +111,29 @@ function reListFiles {
 }
 
 function reListRunPopup {
-  runSelectPopup:CLEAR.
-  set runSelectPopup:OPTIONS to fileList.
+  parameter popupToRelist.
+  popupToRelist:CLEAR.
+  set popupToRelist:OPTIONS to fileList.
 }
 
 function reListDeletePopup {
-  deleteSelectPopup:CLEAR.
-  set deleteSelectPopup:OPTIONS to fileList.
+  parameter popupToRelist.
+  popupToRelist:CLEAR.
+  set popupToRelist:OPTIONS to fileList.
 }
 
 function automationListEditClick {
-  editAutomationListToggle(lastStack).
+  parameter buttonCalledFrom.
+  if buttonCalledFrom:PRESSED {
+    switchStackTo(//function from guiTools.lib.ks
+      consoleGUI:
+      WIDGETS[5]:
+      WIDGETS[1]:
+      WIDGETS[4]
+    ).
+  } else {
+    switchStackTo(lastStack, internalScriptOptions).
+  }
   // set scriptTitlesBox:STYLE:WIDTH to 329.
 }
 
@@ -131,30 +149,30 @@ function internalAutomationHideShow {
   parameter hideButton.
 }
 
-function editAutomationListToggle {
-  parameter previousStack.
-  if automationListEdit:PRESSED {
-    switchStackTo(automationListEditStack). //function from guiTools.lib.ks
-  } else {
-    switchStackTo(previousStack, internalScriptOptions).
-  }
-}
-
 function automationVisToggled {
   parameter buttonClicked.
   set editRowString to buttonClicked:PARENT:WIDGETS[0]:TEXT.
   if internalScriptOptions[editRowString] = true {
     set internalScriptOptions[editRowString] to false.
-    findAndHideLabelGUI(internalAutomationBox,editRowString).
+    findAndHideLabelGUI(
+      buttonClicked:PARENT:PARENT:PARENT:PARENT:WIDGETS[0],
+      editRowString
+    ).
   } else {
     set internalScriptOptions[editRowString] to true.
   }
 }
 
 function automationButtonListRefresh {
+  local autoButtons is consoleGUI:
+  WIDGETS[5]://scriptsArea
+  WIDGETS[1]://internalScriptsArea
+  WIDGETS[0]://internalAutoListStack
+  WIDGETS[0]://internalAutomationBox
+  WIDGETS.//list of buttons
   for key in internalScriptOptions:KEYS {
     if internalScriptOptions[key] = true {
-      for button in internalAutomationBox:WIDGETS {
+      for button in autoButtons {
         if button:TEXT = key {button:SHOW.}
       }
     }
@@ -162,9 +180,11 @@ function automationButtonListRefresh {
 }
 
 function closeAutomationClicked {
+  parameter buttonCalledFrom.
   switchStackTo(lastStack).
-  set automationListEdit:ENABLED to true.
-  set loadSelectPopup:ENABLED to true.
-  set runSelectPopup:ENABLED to true.
-  set deleteSelectPopup:ENABLED to true.
+  local topGui is buttonCalledFrom:PARENT:PARENT:PARENT:PARENT:PARENT.
+  set topGui:WIDGETS[1]:WIDGETS[1]:ENABLED to true.
+  set topGui:WIDGETS[2]:WIDGETS[1]:ENABLED to true.
+  set topGui:WIDGETS[3]:WIDGETS[1]:ENABLED to true.
+  set topGui:WIDGETS[4]:WIDGETS[2]:ENABLED to true.
 }

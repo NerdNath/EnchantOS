@@ -35,6 +35,7 @@ global archiveList is createScriptOnlyFileList(). //called from fileIO.lib.ks
 lock fileList to createScriptOnlyFileList(1). //using optional parameter
 global terminateCommanded is false.
 global scriptCalled is false.
+global scriptToRun is "".
 global launchUnderway is false.
 global launchAbortedDuringSession is false.
 global ascentCompleted is false.
@@ -69,13 +70,14 @@ createLoadLayout().
 createRunLayout().
 createDeleteLayout().
 createScriptsBox().
-createAutomationListEditButton().
 createInternalAutomationBox().
 createAutomationListEditBox().
 
-//show the internal automation area & use optional doLastStackSet parameter
-//which requires using the exclusion lexicon optional parameter first
-switchStackTo(internalAutomationListStack, internalScriptOptions, true).
+switchStackTo(
+  consoleGUI:WIDGETS[5]:WIDGETS[1]:WIDGETS[0],//show internalAutoListStack
+  internalScriptOptions,//use optional doLastStackSet parameter
+  true//which requires using the exclusion lexicon optional parameter first
+).
 
 //show the console GUI.
 consoleGUI:SHOW.
@@ -83,8 +85,7 @@ consoleGUI:SHOW.
 //main program loop
 until terminateCommanded {
   if scriptCalled {
-    runpath(runSelected(runSelectPopup:PRESSED)).
-    set runScriptButton:ENABLED to false.
+    runpath(scriptToRun).
     set scriptCalled to false.
   }
   if launchUnderway {

@@ -6,25 +6,52 @@
 runoncepath("1:/library/guiTools.lib.ks").
 
 function enchantMnvLock {
-  set automationListEdit:ENABLED to false.
-  set loadSelectPopup:ENABLED to false.
-  set runSelectPopup:ENABLED to false.
-  set deleteSelectPopup:ENABLED to false.
-  switchStackTo(mnvLockStack).//from guiTools.lib.ks
+  parameter buttonCalledFrom.
+  set consoleGUI:WIDGETS[1]:WIDGETS[1]:ENABLED to false.
+  set consoleGUI:WIDGETS[1]:WIDGETS[2]:ENABLED to false.
+  set consoleGUI:WIDGETS[2]:WIDGETS[1]:ENABLED to false.
+  set consoleGUI:WIDGETS[2]:WIDGETS[2]:ENABLED to false.
+  set consoleGUI:WIDGETS[3]:WIDGETS[1]:ENABLED to false.
+  set consoleGUI:WIDGETS[3]:WIDGETS[2]:ENABLED to false.
+  set consoleGUI:WIDGETS[4]:WIDGETS[2]:ENABLED to false.
+  switchStackTo(//from guiTools.lib.ks
+    consoleGUI:
+    WIDGETS[5]:
+    WIDGETS[1]:
+    WIDGETS[1]
+  ).
 }
 
 function enchantLaunch {
-  set automationListEdit:ENABLED to false.
-  set loadSelectPopup:ENABLED to false.
-  set runSelectPopup:ENABLED to false.
-  set deleteSelectPopup:ENABLED to false.
-  switchStackTo(launchStack).//from guiTools.lib.ks
+  parameter buttonCalledFrom.
+  set consoleGUI:WIDGETS[1]:WIDGETS[1]:ENABLED to false.
+  set consoleGUI:WIDGETS[1]:WIDGETS[2]:ENABLED to false.
+  set consoleGUI:WIDGETS[2]:WIDGETS[1]:ENABLED to false.
+  set consoleGUI:WIDGETS[2]:WIDGETS[2]:ENABLED to false.
+  set consoleGUI:WIDGETS[3]:WIDGETS[1]:ENABLED to false.
+  set consoleGUI:WIDGETS[3]:WIDGETS[2]:ENABLED to false.
+  set consoleGUI:WIDGETS[4]:WIDGETS[2]:ENABLED to false.
+  switchStackTo(//from guiTools.lib.ks
+    consoleGUI:
+    WIDGETS[5]:
+    WIDGETS[1]:
+    WIDGETS[2]
+  ).
 }
 
 function enchantHoverslam {
-  set automationListEdit:ENABLED to false.
-  set loadSelectPopup:ENABLED to false.
-  set runSelectPopup:ENABLED to false.
-  set deleteSelectPopup:ENABLED to false.
-  switchStackTo(hoverslamStack).//from guiTools.lib.ks
+  parameter buttonCalledFrom.
+  set consoleGUI:WIDGETS[1]:WIDGETS[1]:ENABLED to false.
+  set consoleGUI:WIDGETS[1]:WIDGETS[2]:ENABLED to false.
+  set consoleGUI:WIDGETS[2]:WIDGETS[1]:ENABLED to false.
+  set consoleGUI:WIDGETS[2]:WIDGETS[2]:ENABLED to false.
+  set consoleGUI:WIDGETS[3]:WIDGETS[1]:ENABLED to false.
+  set consoleGUI:WIDGETS[3]:WIDGETS[2]:ENABLED to false.
+  set consoleGUI:WIDGETS[4]:WIDGETS[2]:ENABLED to false.
+  switchStackTo(//from guiTools.lib.ks
+    consoleGUI:
+    WIDGETS[5]:
+    WIDGETS[1]:
+    WIDGETS[3]
+  ).
 }
